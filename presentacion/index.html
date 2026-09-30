@@ -67,7 +67,8 @@
 
     .stage {
       width: min(1100px, 100%);
-      height: min(640px, 100%);
+      height: 100%;
+      max-height: 740px;
       background: var(--card);
       border: 1px solid var(--line);
       border-radius: 22px;
@@ -83,6 +84,7 @@
       padding: clamp(22px, 3.2vw, 42px) clamp(22px, 3.6vw, 48px) 28px;
     }
     .slide.active { display: block; }
+    .slide.cover-slide { padding: 0; overflow: hidden; }
 
     .kicker {
       display: inline-block;
@@ -156,10 +158,9 @@
       line-height: 1.45;
       overflow: auto;
     }
-    code.c { font-family: inherit; color: #f3b07a; }
-    code.k { color: #8fd0ff; }
-    code.s { color: #b6e3b0; }
-    code.n { color: #f7d38a; }
+    pre .k { color: #8fd0ff; }
+    pre .s { color: #b6e3b0; }
+    pre .n { color: #f7d38a; }
 
     table {
       width: 100%;
@@ -286,8 +287,7 @@
         linear-gradient(160deg, rgba(15, 76, 92, 0.94), rgba(15, 76, 92, 0.78)),
         repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0 12px, transparent 12px 28px);
       color: white;
-      margin: -42px -48px -28px;
-      padding: 42px 48px;
+      padding: clamp(28px, 5vw, 56px);
     }
     .cover .kicker { color: #ffd0bf; }
     .cover h1 { font-size: clamp(40px, 6vw, 68px); max-width: 14ch; }
@@ -326,7 +326,8 @@
       .stage { height: auto; min-height: 78vh; }
       .slide { overflow: visible; }
       .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
-      .cover { margin: -22px; padding: 28px 22px; min-height: 70vh; }
+      .cover { padding: 28px 22px; min-height: 70vh; }
+      pre { font-size: 12.5px; white-space: pre-wrap; }
       header.top .hide-sm, footer.bar .hide-sm { display: none; }
     }
 
@@ -336,7 +337,7 @@
       header.top, footer.bar { display: none; }
       .stage { width: auto; height: auto; box-shadow: none; border: 0; }
       .slide { display: block; page-break-after: always; height: auto; }
-      .cover { margin: 0; min-height: 80vh; }
+      .cover { min-height: 80vh; }
     }
   </style>
 </head>
@@ -351,7 +352,7 @@
     <div class="stage-wrap">
       <main class="stage" id="stage">
 
-        <section class="slide active">
+        <section class="slide cover-slide active">
           <div class="cover">
             <div class="kicker">Guía para el parcial</div>
             <h1>Colas con programación orientada a objetos</h1>
@@ -539,8 +540,10 @@
   }
 }</pre>
             <pre><span class="k">public int</span> desencolar() {
-  <span class="k">if</span> (frente == <span class="k">null</span>)
-    <span class="k">throw new</span> IllegalStateException(<span class="s">"vacía"</span>);
+  <span class="k">if</span> (frente == <span class="k">null</span>) {
+    <span class="k">throw new</span> IllegalStateException(
+      <span class="s">"vacía"</span>);
+  }
   <span class="k">int</span> dato = frente.dato;
   frente = frente.siguiente;
   <span class="k">if</span> (frente == <span class="k">null</span>) fin = <span class="k">null</span>;
@@ -591,16 +594,20 @@
           <div class="kicker">Código · arreglo circular</div>
           <h2>Índices con módulo</h2>
           <pre><span class="k">public void</span> encolar(<span class="k">int</span> dato) {
-  <span class="k">if</span> (tamano == capacidad)
-    <span class="k">throw new</span> IllegalStateException(<span class="s">"llena"</span>);
+  <span class="k">if</span> (tamano == capacidad) {
+    <span class="k">throw new</span> IllegalStateException(
+      <span class="s">"llena"</span>);
+  }
   fin = (fin + <span class="n">1</span>) % capacidad;
   datos[fin] = dato;
   tamano++;
 }
 
 <span class="k">public int</span> desencolar() {
-  <span class="k">if</span> (tamano == <span class="n">0</span>)
-    <span class="k">throw new</span> IllegalStateException(<span class="s">"vacía"</span>);
+  <span class="k">if</span> (tamano == <span class="n">0</span>) {
+    <span class="k">throw new</span> IllegalStateException(
+      <span class="s">"vacía"</span>);
+  }
   <span class="k">int</span> dato = datos[frente];
   frente = (frente + <span class="n">1</span>) % capacidad;
   tamano--;
@@ -774,6 +781,10 @@
 
     function show(next) {
       index = Math.max(0, Math.min(slides.length - 1, next));
+      const nextHash = "#" + (index + 1);
+      if (location.hash !== nextHash) {
+        try { history.replaceState(null, "", nextHash); } catch (error) {}
+      }
       slides.forEach((slide, i) => slide.classList.toggle("active", i === index));
       counter.textContent = (index + 1) + " / " + slides.length;
       bar.style.width = ((index + 1) / slides.length * 100) + "%";
@@ -925,9 +936,17 @@
     document.getElementById("circ-prev").addEventListener("click", () => showCirc(circAt - 1));
     document.getElementById("circ-next").addEventListener("click", () => showCirc(circAt + 1));
 
-    show(0);
-    showFifo(0);
-    showCirc(0);
+    const params = new URLSearchParams(location.search);
+    const fromHash = parseInt(location.hash.replace("#", ""), 10);
+    const fromQuery = parseInt(params.get("slide") || "", 10);
+    const start = !Number.isNaN(fromHash) && fromHash >= 1
+      ? fromHash - 1
+      : (!Number.isNaN(fromQuery) && fromQuery >= 1 ? fromQuery - 1 : 0);
+    const fifoStart = parseInt(params.get("fifo") || "0", 10);
+    const circStart = parseInt(params.get("circ") || "0", 10);
+    show(start);
+    showFifo(Number.isNaN(fifoStart) ? 0 : fifoStart);
+    showCirc(Number.isNaN(circStart) ? 0 : circStart);
   </script>
 </body>
 </html>
