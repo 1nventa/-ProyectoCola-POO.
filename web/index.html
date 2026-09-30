@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lactario 0115 · Desnutrición, fórmulas y APME</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,650&family=Outfit:wght@380;500;640&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <header class="cabecera">
+    <div>
+      <p class="sobre">Nutrición clínica pediátrica · Resolución 0115 de 2026</p>
+      <h1>Lactario de fórmulas y APME</h1>
+    </div>
+    <p class="aviso-corto">Apoyo de estudio para el cálculo de F-75, F-100 y FTLC. No reemplaza la prescripción.</p>
+  </header>
+
+  <nav class="pestanas" aria-label="Secciones">
+    <button type="button" class="pestana activa" data-seccion="calculadora">Cálculo y cola</button>
+    <button type="button" class="pestana" data-seccion="lineamiento">Lineamiento</button>
+    <button type="button" class="pestana" data-seccion="vademecum">Vademécum APME</button>
+    <button type="button" class="pestana" data-seccion="organoleptica">Matriz organoléptica</button>
+  </nav>
+
+  <main>
+    <section id="calculadora" class="seccion activa">
+      <div class="rejilla">
+        <form id="formulario" class="tarjeta">
+          <div class="fila-titulo">
+            <h2>Paciente en preparación</h2>
+            <button type="button" id="caso-guia" class="texto">Cargar caso de la guía</button>
+          </div>
+          <label>Nombre
+            <input id="nombre" name="nombre" required value="Caso guía">
+          </label>
+          <div class="dos">
+            <label>Edad (meses)
+              <input id="edad" name="edad" type="number" min="0" max="59" step="1" value="6" required>
+            </label>
+            <label>Peso (kg)
+              <input id="peso" name="peso" type="number" min="0.1" max="40" step="0.1" value="7" required>
+            </label>
+          </div>
+          <div class="dos">
+            <label>Puntaje Z peso/talla
+              <input id="z" name="z" type="number" step="0.01" placeholder="Opcional">
+            </label>
+            <label>Día de estabilización
+              <input id="dia" name="dia" type="number" min="1" max="5" step="1" value="1" required>
+            </label>
+          </div>
+          <label>Alergias o intolerancias
+            <input id="alergias" name="alergias" placeholder="Ejemplo: leche, maní, soya">
+          </label>
+          <label class="chequeo">
+            <input id="edema" type="checkbox">
+            Edema
+          </label>
+          <fieldset>
+            <legend>Fase</legend>
+            <label><input type="radio" name="fase" value="estabilizacion" checked> Estabilización · F-75</label>
+            <label><input type="radio" name="fase" value="transicion"> Transición · F-100</label>
+            <label><input type="radio" name="fase" value="ambulatoria"> Ambulatoria · FTLC</label>
+          </fieldset>
+          <div id="bloque-f75">
+            <label>Esquema de la Resolución 0115
+              <select id="esquema">
+                <option value="severa_sin_edema">Tabla 16 · severa sin edema</option>
+                <option value="severa_con_edema">Tabla 16 · severa con edema</option>
+                <option value="moderada">Tabla 15 · moderada</option>
+              </select>
+            </label>
+            <p id="nota-esquema" class="nota"></p>
+          </div>
+          <div id="bloque-ftlc" hidden>
+            <label>Dosis de FTLC
+              <select id="dosis-ftlc">
+                <option value="255">Riesgo con factores: 240 a 270 kcal/día (se usa 255)</option>
+                <option value="240">240 kcal/día</option>
+                <option value="270">270 kcal/día</option>
+                <option value="100kg">Seguimiento 2: 100 kcal/kg/día</option>
+              </select>
+            </label>
+          </div>
+          <div class="acciones">
+            <button type="submit" class="primario">Calcular orden</button>
+            <button type="button" id="encolar" class="secundario">Encolar</button>
+          </div>
+        </form>
+
+        <article id="resultado" class="tarjeta orden" aria-live="polite"></article>
+      </div>
+
+      <section class="tarjeta cola" aria-labelledby="titulo-cola">
+        <div class="fila-titulo">
+          <h2 id="titulo-cola">Cola del lactario</h2>
+          <button type="button" id="atender" class="primario">Atender al primero</button>
+        </div>
+        <p class="nota">La fórmula se prepara por toma. Cada 3 horas hay una toma, ocho en el día. No se deja lista la cantidad de las 24 horas.</p>
+        <ol id="lista-cola"></ol>
+      </section>
+    </section>
+
+    <section id="lineamiento" class="seccion">
+      <article class="tarjeta prosa">
+        <h2>Qué fija el lineamiento</h2>
+        <p>La Resolución 0115 de 2026 modifica la Resolución 2350 de 2020. Cubre la desnutrición aguda moderada y severa de 0 a 59 meses y define el riesgo de desnutrición aguda, con énfasis en La Guajira, Chocó y Vichada.</p>
+        <ul>
+          <li>Riesgo: puntaje Z de peso para talla o longitud mayor que −2 y menor que −1.</li>
+          <li>Egreso del manejo: puntaje Z igual o superior a −1, no el antiguo corte de −2.</li>
+          <li>Estabilización hospitalaria con F-75. Transición con F-100. Ambulatorio con FTLC, 500 kcal por sobre.</li>
+          <li>Menores de 6 meses: primero lactancia y técnica de suplementación por succión. La fórmula de inicio entra si no hay ganancia efectiva o no es posible amamantar, después de valorar leche humana donada.</li>
+          <li>F-75 y F-100 se ofrecen con taza, cuchara o jeringa. No con biberón. Sonda solo si la vía oral no es posible.</li>
+          <li>La fórmula preparada no pasa de 2 horas a temperatura ambiente ni de 8 horas en nevera exclusiva.</li>
+          <li>Ganancia esperada: 25 a 30 g/día antes de los 3 meses, 12 a 16 g/día entre 3 y 6 meses, y más de 10 g/día después de los 6 meses en recuperación.</li>
+        </ul>
+        <h3>Reconstitución de F-75</h3>
+        <p>Por cada 55 ml de fórmula preparada: 50 ml de agua y 2 cucharadas rasas. Una cucharada pesa 4,6 g. Cada 100 ml aportan 75 kcal. El agua y el polvo del día se dividen entre las 8 tomas.</p>
+        <h3>Ingredientes de referencia</h3>
+        <p>F-75: maltodextrina, aceites de palma, soya y coco, azúcar y leche descremada. F-100: esos aceites, maltodextrina, leche descremada, proteína de suero y lactosa. Aporta 100 kcal, 2,9 g de proteína y cerca de 5,4 g de grasa por 100 ml.</p>
+      </article>
+    </section>
+
+    <section id="vademecum" class="seccion">
+      <div class="fila-titulo">
+        <h2>Vademécum por laboratorio</h2>
+        <label class="filtro">Laboratorio
+          <select id="filtro-lab">
+            <option value="todos">Todos</option>
+            <option>Boydorr</option>
+            <option>Fresenius</option>
+            <option>Nutricia</option>
+            <option>Abbott</option>
+          </select>
+        </label>
+      </div>
+      <div id="lista-apme" class="mosaico"></div>
+    </section>
+
+    <section id="organoleptica" class="seccion">
+      <article class="tarjeta prosa">
+        <h2>Matriz de evaluación organoléptica</h2>
+        <p>La actividad pide probar tres APME y dejar por escrito apariencia, olor, textura, sabor e indicación. Esta ficha guarda el borrador en el navegador. La puntuación solo la puede asignar quien degustó el producto.</p>
+        <label>Nombre del estudiante
+          <input id="estudiante" type="text" autocomplete="name">
+        </label>
+      </article>
+      <div id="fichas-sensoriales"></div>
+      <article class="tarjeta prosa">
+        <h3>Reflexión</h3>
+        <label>Experiencia al probar varias fórmulas en poco tiempo
+          <textarea id="reflexion-experiencia" rows="4"></textarea>
+        </label>
+        <label>Empatía clínica: ¿es realista pedir 2 o 3 tomas diarias durante meses sin cambiar sabor o textura?
+          <textarea id="reflexion-empatia" rows="4"></textarea>
+        </label>
+        <button type="button" id="guardar-matriz" class="primario">Guardar borrador</button>
+        <button type="button" id="imprimir-matriz" class="secundario">Imprimir</button>
+        <p id="estado-matriz" class="nota"></p>
+      </article>
+    </section>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
