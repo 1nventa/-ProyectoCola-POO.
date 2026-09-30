@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Colas en POO — Guía para el parcial</title>
+  <style>
+    :root {
+      --ink: #1c1917;
+      --muted: #57534e;
+      --paper: #f6f1e7;
+      --card: #fffdf8;
+      --line: #e7dfd2;
+      --teal: #0f4c5c;
+      --teal-soft: #e5f1f3;
+      --terra: #c4532a;
+      --terra-soft: #fde8df;
+      --ok: #1f7a4d;
+      --ok-soft: #e5f6ed;
+      --code: #172033;
+      --shadow: 0 18px 50px rgba(28, 25, 23, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      background:
+        radial-gradient(1200px 500px at 10% -10%, #d7ebe8 0%, transparent 55%),
+        radial-gradient(900px 400px at 110% 0%, #f6d7c8 0%, transparent 50%),
+        var(--paper);
+      color: var(--ink);
+      overflow: hidden;
+    }
+
+    .deck {
+      height: 100%;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      padding: 16px 18px 12px;
+      gap: 10px;
+    }
+
+    header.top, footer.bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      letter-spacing: 0.02em;
+    }
+
+    .brand {
+      font-weight: 700;
+      color: var(--teal);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 12px;
+    }
+
+    .stage-wrap {
+      min-height: 0;
+      display: grid;
+      place-items: center;
+    }
+
+    .stage {
+      width: min(1100px, 100%);
+      height: min(640px, 100%);
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide {
+      display: none;
+      height: 100%;
+      overflow: auto;
+      padding: clamp(22px, 3.2vw, 42px) clamp(22px, 3.6vw, 48px) 28px;
+    }
+    .slide.active { display: block; }
+
+    .kicker {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--terra);
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      font-size: clamp(32px, 4.4vw, 54px);
+      line-height: 1.05;
+      margin: 0 0 12px;
+      letter-spacing: -0.03em;
+    }
+    h2 {
+      font-size: clamp(26px, 3.2vw, 38px);
+      line-height: 1.12;
+      margin: 0 0 16px;
+      letter-spacing: -0.03em;
+    }
+    p { margin: 0 0 12px; line-height: 1.45; }
+    .lead { font-size: clamp(17px, 2vw, 22px); color: var(--muted); max-width: 40rem; }
+
+    .grid-2, .grid-3, .grid-4 {
+      display: grid;
+      gap: 12px;
+    }
+    .grid-2 { grid-template-columns: 1.1fr 0.9fr; }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+    .card, .op, .qcard, .mini {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px 14px 12px;
+    }
+    .card h3, .op h3, .mini h3 {
+      margin: 0 0 6px;
+      font-size: 16px;
+    }
+    .card p, .op p, .mini p { margin: 0; color: var(--muted); font-size: 14.5px; line-height: 1.4; }
+
+    .op strong { color: var(--teal); }
+    .pill {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 12px;
+      font-weight: 700;
+      background: var(--teal-soft);
+      color: var(--teal);
+    }
+    .pill.warn { background: var(--terra-soft); color: var(--terra); }
+    .pill.ok { background: var(--ok-soft); color: var(--ok); }
+
+    ul.clean { margin: 8px 0 0; padding-left: 18px; }
+    ul.clean li { margin: 6px 0; line-height: 1.35; }
+
+    pre {
+      margin: 0;
+      background: var(--code);
+      color: #e8eefc;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-family: "Cascadia Code", "SFMono-Regular", ui-monospace, Consolas, monospace;
+      font-size: 13.5px;
+      line-height: 1.45;
+      overflow: auto;
+    }
+    code.c { font-family: inherit; color: #f3b07a; }
+    code.k { color: #8fd0ff; }
+    code.s { color: #b6e3b0; }
+    code.n { color: #f7d38a; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 15px;
+    }
+    th, td {
+      text-align: left;
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    th { color: var(--teal); font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; }
+
+    .queue {
+      display: flex;
+      gap: 8px;
+      align-items: stretch;
+      min-height: 74px;
+    }
+    .slot {
+      width: 72px;
+      height: 72px;
+      border-radius: 12px;
+      border: 2px dashed #d6d0c6;
+      display: grid;
+      place-items: center;
+      font-weight: 750;
+      font-size: 20px;
+      background: #faf7f2;
+      position: relative;
+    }
+    .slot.filled {
+      border-style: solid;
+      border-color: var(--teal);
+      background: var(--teal-soft);
+      color: var(--teal);
+    }
+    .slot.out {
+      border-color: var(--terra);
+      background: var(--terra-soft);
+      color: var(--terra);
+    }
+    .tag {
+      position: absolute;
+      bottom: -18px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .arrow-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 22px;
+    }
+
+    .nodes { display: flex; align-items: center; gap: 0; flex-wrap: wrap; }
+    .node {
+      background: var(--teal);
+      color: white;
+      border-radius: 12px;
+      min-width: 74px;
+      padding: 10px 8px 8px;
+      text-align: center;
+    }
+    .node small { display: block; opacity: 0.75; font-size: 11px; letter-spacing: 0.06em; }
+    .node b { font-size: 20px; }
+    .link {
+      width: 28px;
+      height: 2px;
+      background: var(--ink);
+      position: relative;
+    }
+    .link::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: -4px;
+      border: 5px solid transparent;
+      border-left-color: var(--ink);
+    }
+
+    button.nav, button.ghost, button.step {
+      border: 0;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button.nav { background: var(--teal); color: white; }
+    button.ghost, button.step {
+      background: white;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+    button:disabled { opacity: 0.4; cursor: default; }
+
+    .controls { display: flex; gap: 8px; align-items: center; }
+    .progress {
+      height: 4px;
+      background: #e7dfd2;
+      border-radius: 99px;
+      overflow: hidden;
+      width: min(280px, 30vw);
+    }
+    .progress > div {
+      height: 100%;
+      background: var(--terra);
+      width: 0%;
+    }
+
+    .cover {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      background:
+        linear-gradient(160deg, rgba(15, 76, 92, 0.94), rgba(15, 76, 92, 0.78)),
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0 12px, transparent 12px 28px);
+      color: white;
+      margin: -42px -48px -28px;
+      padding: 42px 48px;
+    }
+    .cover .kicker { color: #ffd0bf; }
+    .cover h1 { font-size: clamp(40px, 6vw, 68px); max-width: 14ch; }
+    .cover p { color: rgba(255,255,255,0.86); font-size: 18px; max-width: 36rem; }
+
+    .qcard { cursor: pointer; min-height: 112px; }
+    .qcard .a { display: none; color: var(--teal); font-weight: 650; margin-top: 8px; }
+    .qcard.open .a { display: block; }
+    .qcard .hint { color: var(--terra); font-size: 12px; font-weight: 700; margin-top: 8px; }
+
+    .callout {
+      border-left: 4px solid var(--terra);
+      background: var(--terra-soft);
+      border-radius: 0 12px 12px 0;
+      padding: 10px 12px;
+      font-size: 14.5px;
+    }
+    .callout.ok {
+      border-left-color: var(--ok);
+      background: var(--ok-soft);
+    }
+
+    .trace-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: end;
+      margin-bottom: 14px;
+    }
+    .trace-op { font-size: 20px; font-weight: 750; }
+    .slots-wrap { padding-bottom: 18px; }
+
+    @media (max-width: 860px) {
+      body { overflow: auto; }
+      .deck { height: auto; min-height: 100%; }
+      .stage { height: auto; min-height: 78vh; }
+      .slide { overflow: visible; }
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+      .cover { margin: -22px; padding: 28px 22px; min-height: 70vh; }
+      header.top .hide-sm, footer.bar .hide-sm { display: none; }
+    }
+
+    @media print {
+      body { overflow: visible; background: white; }
+      .deck { display: block; padding: 0; }
+      header.top, footer.bar { display: none; }
+      .stage { width: auto; height: auto; box-shadow: none; border: 0; }
+      .slide { display: block; page-break-after: always; height: auto; }
+      .cover { margin: 0; min-height: 80vh; }
+    }
+  </style>
+</head>
+<body>
+  <div class="deck">
+    <header class="top">
+      <div class="brand">Proyecto Cola · POO</div>
+      <div class="hide-sm">Flechas, espacio o desliza para cambiar de diapositiva</div>
+      <div id="counter">1 / 1</div>
+    </header>
+
+    <div class="stage-wrap">
+      <main class="stage" id="stage">
+
+        <section class="slide active">
+          <div class="cover">
+            <div class="kicker">Guía para el parcial</div>
+            <h1>Colas con programación orientada a objetos</h1>
+            <p>Definición, operaciones, lista enlazada, arreglo circular y los errores que más se penalizan.</p>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="kicker">Antes de empezar</div>
+          <h2>Qué tienes que poder hacer sin apuntes</h2>
+          <div class="grid-2">
+            <div class="card">
+              <h3>Explicar</h3>
+              <ul class="clean">
+                <li>Qué es una cola y por qué es FIFO.</li>
+                <li>Dónde se inserta y de dónde se elimina.</li>
+                <li>Qué guarda privada la clase y qué muestra al exterior.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>Escribir y trazar</h3>
+              <ul class="clean">
+                <li><b>encolar</b> y <b>desencolar</b> con nodos.</li>
+                <li>Lo mismo con arreglo circular y módulo.</li>
+                <li>El estado de frente, fin y los datos después de cada llamada.</li>
+              </ul>
+            </div>
+          </div>
+          <p class="lead" style="margin-top:16px">En cada diapositiva de pregunta, toca la tarjeta para ver la respuesta.</p>
+        </section>
+
+        <section class="slide">
+          <div class="kicker">Concepto</div>
+          <h2>Una cola es una fila</h2>
+          <div class="grid-2">
+            <div>
+              <p>Estructura lineal con dos extremos. El primero que entra es el primero que sale: <b>FIFO</b> (<i>First In, First Out</i>).</p>
+              <div class="callout">Quien llega se forma <b>al final</b>. Quien atiende sale <b>por el frente</b>. Nadie se cuela ni se va por atrás.</div>
+              <ul class="clean">
+                <li><b>Frente:</b> el elemento que saldrá ahora.</li>
+                <li><b>Final:</b> el último que llegó.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>Ejemplo cotidiano</h3>
+              <p>Fila del banco, cola de impresión, turnos de un videojuego, procesos esperando CPU.</p>
+              <p style="margin-top:10px">Si entran Ana, Luis y Mara, en ese orden, la siguiente en salir es Ana. Luis no puede adelantarla.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="kicker">Visual</div>
+          <h2>FIFO en cuatro pasos</h2>
+          <div class="slots-wrap">
+            <div class="queue" id="fifo"></div>
+          </div>
+          <div class="trace-head">
+            <div>
+              <div class="kicker" style="margin:0">Operación</div>
+              <div class="trace-op" id="fifo-op">Inicio</div>
+              <p id="fifo-note" style="color:var(--muted);margin-top:4px"></p>
+            </div>
+            <div class="controls">
+              <button class="step" id="fifo-prev" type="button">Anterior</button>
+              <button class="nav" id="fifo-next" type="button">Siguiente paso</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="kicker">Operaciones</div>
+          <h2>El contrato de la cola</h2>
+          <table>
+            <thead>
+              <tr><th>Método</th><th>Qué hace</th><th>Costo bien hecha</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><b>encolar(x)</b></td><td>Inserta x al final.</td><td>O(1)</td></tr>
+              <tr><td><b>desencolar()</b></td><td>Quita el frente y lo devuelve.</td><td>O(1)</td></tr>
+              <tr><td><b>frente()</b></td><td>Mira el frente y no lo quita.</td><td>O(1)</td></tr>
+              <tr><td><b>estaVacia()</b></td><td>Indica si no hay elementos.</td><td>O(1)</td></tr>
+              <tr><td><b>tamano()</b></td><td>Cuántos elementos hay.</td><td>O(1)</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top:12px;color:var(--muted)">Si la cola está vacía, <b>desencolar</b> y <b>frente</b> deben fallar de forma explícita. En un parcial, ignorar ese caso suele restar puntos.</p>
+        </section>
+
+        <section class="slide">
+          <div class="kicker">TDA</div>
+          <h2>Primero el qué, después el cómo</h2>
+          <div class="grid-3">
+            <div class="mini">
+              <span class="pill">1</span>
+              <h3>Tipo de dato abstracto</h3>
+              <p>La cola se define por sus operaciones, no por arreglos ni nodos.</p>
+            </div>
+            <div class="mini">
+              <span class="pill">2</span>
+              <h3>Implementación</h3>
+              <p>Lista enlazada o arreglo circular cumplen el mismo contrato.</p>
+            </div>
+            <div class="mini">
+              <span class="pill">3</span>
+              <h3>Cliente</h3>
+              <p>Quien usa la cola solo llama encolar y desencolar. No recorre nodos.</p>
+            </div>
+          </div>
+          <div class="callout ok" style="margin-top:16px">En el examen pueden pedirte cambiar la implementación sin cambiar los métodos públicos. Si el resto del programa dependía de nodos o índices, el diseño estaba mal encapsulado.</div>
+        </section>
+
+        <section class="slide">
+          <div class="kicker">POO</div>
+          <h2>La clase Cola tiene una sola responsabilidad</h2>
+          <div class="grid-2">
+            <div>
+              <p>La <b>clase</b> es el molde. Cada <b>objeto</b> es una cola distinta, con su propio frente y su propio final.</p>
+              <ul class="clean">
+                <li><b>Abstracción:</b> el usuario piensa en “formar” y “atender”, no en punteros.</li>
+                <li><b>Encapsulamiento:</b> frente, fin y los datos son privados.</li>
+                <li><b>Interfaz pequeña:</b> solo las operaciones del TDA.</li>
+              </ul>
+            </div>
+            <pre><span class="k">public class</span> Cola {
+  <span class="k">private</span> Nodo frente;
+  <span class="k">private</span> Nodo fin;
+
+  <span class="k">public void</span> encolar(<span class="k">int</span> dato) { }
+  <span class="k">public int</span> desencolar() { }
+  <span class="k">public int</span> frente() { }
+  <span class="k">public boolean</span> estaVacia() { }
+}</pre>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="kicker">Encapsulamiento</div>
+          <h2>Qué es privado y por qué</h2>
+          <div class="grid-2">
+            <div class="card">
+              <h3>Privado</h3>
+              <p>frente, fin, el arreglo, la capacidad y el tamaño. Si alguien de afuera mueve el frente, la cola deja de ser FIFO y el invariante se rompe.</p>
+            </div>
+            <div class="card">
+              <h3>Público</h3>
+              <p>encolar, desencolar, frente, estaVacia y tamano. Esos métodos son los únicos que pueden cambiar o consultar el estado, y lo hacen con las reglas de la cola.</p>
+            </div>
+          </div>
+          <div class="callout" style="margin-top:14px">Invariante que debes poder decir en voz alta: los elementos salen en el mismo orden en que entraron, y fin apunta al último nodo real (o al último índice ocupado).</div>
+        </section>
+
+        <section class="slide">
+          <div class="kicker">Lista enlazada</div>
+          <h2>Dos referencias bastan</h2>
+          <div class="nodes" aria-hidden="true">
+            <div class="node"><small>frente</small><b>10</b></div>
+            <div class="link"></div>
+            <div class="node"><small></small><b>20</b></div>
+            <div class="link"></div>
+            <div class="node"><small>fin</small><b>30</b></div>
+          </div>
+          <div class="grid-2" style="margin-top:18px">
+            <div class="mini">
+              <h3>encolar</h3>
+              <p>Creas un nodo y lo enganchas en <b>fin.siguiente</b>. Luego mueves <b>fin</b>. Si estaba vacía, frente y fin apuntan al nodo nuevo.</p>
+            </div>
+            <div class="mini">
+              <h3>desencolar</h3>
+              <p>Guardas el dato de <b>frente</b>, avanzas frente al siguiente y devuelves el dato. Si frente queda en null, fin también debe quedar en null.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="kicker">Código · lista</div>
+          <h2>encolar y desencolar</h2>
+          <div class="grid-2">
+            <pre><span class="k">public void</span> encolar(<span class="k">int</span> dato) {
+  Nodo nuevo = <span class="k">new</span> Nodo(dato);
+  <span class="k">if</span> (fin == <span class="k">null</span>) {
+    frente = fin = nuevo;
+  } <span class="k">else</span> {
+    fin.siguiente = nuevo;
+    fin = nuevo;
+  }
+}</pre>
+            <pre><span class="k">public int</span> desencolar() {
+  <span class="k">if</span> (frente == <span class="k">null</span>)
+    <span class="k">throw new</span> IllegalStateException(<span class="s">"vacía"</span>);
+  <span class="k">int</span> dato = frente.dato;
+  frente = frente.siguiente;
+  <span class="k">if</span> (frente == <span class="k">null</span>) fin = <span class="k">null</span>;
+  <span class="k">return</span> dato;
+}</pre>
+          </div>
+          <p style="margin-top:12px;color:var(--muted)">Nodo solo necesita <b>dato</b> y <b>siguiente</b>. No hace falta un puntero al anterior: la cola no retrocede.</p>
+        </section>
+
+        <section class="slide">
+          <div class="kicker">Error clásico</div>
+          <h2>Vaciar la cola y olvidar el fin</h2>
+          <div class="grid-2">
+            <div>
+              <p>Si queda un solo elemento y haces <b>frente = frente.siguiente</b>, frente pasa a null. El nodo viejo sigue colgando de <b>fin</b>.</p>
+              <div class="callout">El siguiente <b>encolar</b> hace <b>fin.siguiente = nuevo</b> sobre un nodo que ya no está en la cola. El elemento nuevo se pierde y frente sigue en null.</div>
+            </div>
+            <div class="card">
+              <h3>Cómo se corrige</h3>
+              <p>Después de avanzar el frente, si la cola quedó vacía:</p>
+              <pre style="margin-top:10px"><span class="k">if</span> (frente == <span class="k">null</span>)
+  fin = <span class="k">null</span>;</pre>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="kicker">Arreglo</div>
+          <h2>Por qué el arreglo tiene que ser circular</h2>
+          <div class="grid-3">
+            <div class="mini">
+              <h3>Arreglo simple</h3>
+              <p>Desencolar el índice 0 obliga a correr todos los demás un lugar. Eso es O(n).</p>
+            </div>
+            <div class="mini">
+              <h3>Índices que avanzan</h3>
+              <p>Frente y fin se mueven hacia la derecha. El hueco de la izquierda se desperdicia y el arreglo “se acaba” aunque haya espacio.</p>
+            </div>
+            <div class="mini">
+              <h3>Módulo</h3>
+              <p><b>(índice + 1) % capacidad</b> vuelve al inicio. Reutilizas los huecos y encolar y desencolar siguen en O(1).</p>
+            </div>
+          </div>
+          <div class="callout ok" style="margin-top:16px">Con un contador de elementos no confundas cola llena y cola vacía. Llena: tamano == capacidad. Vacía: tamano == 0.</div>
+        </section>
+
+        <section class="slide">
+          <div class="kicker">Código · arreglo circular</div>
+          <h2>Índices con módulo</h2>
+          <pre><span class="k">public void</span> encolar(<span class="k">int</span> dato) {
+  <span class="k">if</span> (tamano == capacidad)
+    <span class="k">throw new</span> IllegalStateException(<span class="s">"llena"</span>);
+  fin = (fin + <span class="n">1</span>) % capacidad;
+  datos[fin] = dato;
+  tamano++;
+}
+
+<span class="k">public int</span> desencolar() {
+  <span class="k">if</span> (tamano == <span class="n">0</span>)
+    <span class="k">throw new</span> IllegalStateException(<span class="s">"vacía"</span>);
+  <span class="k">int</span> dato = datos[frente];
+  frente = (frente + <span class="n">1</span>) % capacidad;
+  tamano--;
+  <span class="k">return</span> dato;
+}</pre>
+          <p style="margin-top:10px;color:var(--muted)">Estado inicial de esta versión: frente = 0, fin = -1, tamano = 0. El primer encolar deja fin en 0.</p>
+        </section>
+
+        <section class="slide">
+          <div class="kicker">Traza de examen</div>
+          <h2>Arreglo de capacidad 5</h2>
+          <div class="slots-wrap">
+            <div class="queue" id="circ"></div>
+          </div>
+          <div class="trace-head">
+            <div>
+              <div class="trace-op" id="circ-op">Inicio</div>
+              <p id="circ-note" style="color:var(--muted);margin:4px 0 0"></p>
+            </div>
+            <div class="controls">
+              <button class="step" id="circ-prev" type="button">Anterior</button>
+              <button class="nav" id="circ-next" type="button">Siguiente paso</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="kicker">Comparación</div>
+          <h2>Cola y pila no se atienden igual</h2>
+          <table>
+            <thead>
+              <tr><th></th><th>Cola</th><th>Pila</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><b>Orden</b></td><td>FIFO</td><td>LIFO: el último en entrar sale primero</td></tr>
+              <tr><td><b>Inserción</b></td><td>Al final</td><td>En el tope</td></tr>
+              <tr><td><b>Extracción</b></td><td>Por el frente</td><td>Por el tope</td></tr>
+              <tr><td><b>Analogía</b></td><td>Fila de personas</td><td>Pila de platos</td></tr>
+              <tr><td><b>Uso típico</b></td><td>Turnos, BFS, búfer</td><td>Deshacer, llamadas, DFS</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="slide">
+          <div class="kicker">Dónde aparece</div>
+          <h2>Si el enunciado habla de turnos, piensa en cola</h2>
+          <div class="grid-4">
+            <div class="mini"><h3>Impresión</h3><p>Los documentos salen en el orden en que se enviaron.</p></div>
+            <div class="mini"><h3>BFS</h3><p>El recorrido por niveles de un grafo o árbol usa una cola.</p></div>
+            <div class="mini"><h3>Procesos</h3><p>La cola de listos guarda quién espera la CPU.</p></div>
+            <div class="mini"><h3>Búfer</h3><p>Teclado, mensajes o streaming: llega por un lado y se consume por el otro.</p></div>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="kicker">Puntos que se pierden</div>
+          <h2>Revísate esto antes de entregar</h2>
+          <div class="grid-2">
+            <div class="card"><h3>1. Lado equivocado</h3><p>Insertar al frente o sacar por el final convierte la cola en otra estructura.</p></div>
+            <div class="card"><h3>2. Desencolar sin devolver</h3><p>El método tiene que quitar el dato y además regresarlo.</p></div>
+            <div class="card"><h3>3. Cola vacía</h3><p>Hay que comprobarla antes de leer el frente.</p></div>
+            <div class="card"><h3>4. Fin huérfano</h3><p>Al sacar el último nodo, fin queda en null.</p></div>
+            <div class="card"><h3>5. Sin módulo</h3><p>fin++ se sale del arreglo aunque a la izquierda haya huecos.</p></div>
+            <div class="card"><h3>6. Recorrer para encolar</h3><p>Si ya guardas fin, caminar desde el frente es O(n) y no hace falta.</p></div>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="kicker">Mini examen</div>
+          <h2>Toca cada tarjeta</h2>
+          <div class="grid-2">
+            <article class="qcard" tabindex="0">
+              <b>1.</b> Encolan 4, 8 y 1. ¿Qué devuelve el primer desencolar?
+              <div class="a">4. Es el primero que entró.</div>
+              <div class="hint">Ver respuesta</div>
+            </article>
+            <article class="qcard" tabindex="0">
+              <b>2.</b> ¿Por qué encolar es O(1) en la lista si guardas fin?
+              <div class="a">Porque enganchas el nodo nuevo directo en fin, sin recorrer.</div>
+              <div class="hint">Ver respuesta</div>
+            </article>
+            <article class="qcard" tabindex="0">
+              <b>3.</b> Capacidad 4, fin vale 3. ¿Dónde cae el siguiente encolar?
+              <div class="a">En el índice 0, porque (3 + 1) % 4 = 0. Solo si la cola no está llena.</div>
+              <div class="hint">Ver respuesta</div>
+            </article>
+            <article class="qcard" tabindex="0">
+              <b>4.</b> frente() y desencolar() se parecen. ¿En qué se distinguen?
+              <div class="a">frente solo consulta. desencolar quita el elemento y la cola cambia.</div>
+              <div class="hint">Ver respuesta</div>
+            </article>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="kicker">Mini examen</div>
+          <h2>Otras cuatro</h2>
+          <div class="grid-2">
+            <article class="qcard" tabindex="0">
+              <b>5.</b> ¿Qué atributo público rompería el encapsulamiento?
+              <div class="a">Publicar frente, fin o el arreglo. Quien sea podría saltarse el orden FIFO.</div>
+              <div class="hint">Ver respuesta</div>
+            </article>
+            <article class="qcard" tabindex="0">
+              <b>6.</b> La cola tiene un solo nodo y desencolas. ¿Cómo quedan frente y fin?
+              <div class="a">Los dos en null. Si fin no se limpia, el próximo encolar se pierde.</div>
+              <div class="hint">Ver respuesta</div>
+            </article>
+            <article class="qcard" tabindex="0">
+              <b>7.</b> ¿Cola llena y cola vacía pueden verse igual en un arreglo circular?
+              <div class="a">Sí, si solo miras frente y fin. Por eso se usa un contador, o se deja un hueco libre.</div>
+              <div class="hint">Ver respuesta</div>
+            </article>
+            <article class="qcard" tabindex="0">
+              <b>8.</b> BFS de un grafo: ¿cola o pila?
+              <div class="a">Cola. Así visitas nivel por nivel. La pila corresponde a DFS.</div>
+              <div class="hint">Ver respuesta</div>
+            </article>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="kicker">Último minuto</div>
+          <h2>Lo que cabe en una hoja</h2>
+          <div class="grid-2">
+            <div>
+              <ul class="clean">
+                <li>FIFO: sale el más antiguo.</li>
+                <li>Entra por el final, sale por el frente.</li>
+                <li>Lista: frente, fin y el caso vacío.</li>
+                <li>Arreglo: <b>(i + 1) % capacidad</b> y un tamaño.</li>
+                <li>Ambas operaciones quedan en O(1).</li>
+                <li>La pila es LIFO; no la mezcles en el dibujo.</li>
+              </ul>
+            </div>
+            <div class="callout ok">
+              Cuando traces, escribe tres cosas en cada paso: el dato que entra o sale, el nuevo frente y el nuevo fin. Si uno de los tres no cambia, dilo igual. El profesor busca ese invariante.
+            </div>
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="kicker">Listo para practicar</div>
+          <h2>Cierra el tema con una traza escrita</h2>
+          <p class="lead">Sobre papel, sin mirar estas diapositivas, ejecuta esta secuencia en una lista y otra vez en un arreglo de capacidad 4.</p>
+          <div class="card">
+            <p><b>encolar(7), encolar(1), encolar(9), desencolar(), frente(), encolar(4), desencolar(), desencolar()</b></p>
+            <p style="margin-top:8px">Resultados que debes obtener al desencolar: 7, luego 1, luego 9. El frente intermedio es 1. Al final solo queda 4.</p>
+          </div>
+          <p style="margin-top:14px;color:var(--muted)">Si tu curso usa otros nombres (<i>insertar</i>, <i>eliminar</i>, <i>rear</i>, <i>front</i>), cambia la etiqueta y conserva la misma idea.</p>
+        </section>
+
+      </main>
+    </div>
+
+    <footer class="bar">
+      <div class="controls">
+        <button class="ghost" id="prev" type="button">Anterior</button>
+        <button class="nav" id="next" type="button">Siguiente</button>
+      </div>
+      <div class="progress" aria-hidden="true"><div id="bar"></div></div>
+      <div class="hide-sm">Imprimir o guardar como PDF desde el navegador</div>
+    </footer>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll(".slide"));
+    const counter = document.getElementById("counter");
+    const bar = document.getElementById("bar");
+    let index = 0;
+
+    function show(next) {
+      index = Math.max(0, Math.min(slides.length - 1, next));
+      slides.forEach((slide, i) => slide.classList.toggle("active", i === index));
+      counter.textContent = (index + 1) + " / " + slides.length;
+      bar.style.width = ((index + 1) / slides.length * 100) + "%";
+      document.getElementById("prev").disabled = index === 0;
+      document.getElementById("next").disabled = index === slides.length - 1;
+      const stage = document.querySelector(".slide.active");
+      if (stage) stage.scrollTop = 0;
+    }
+
+    document.getElementById("prev").addEventListener("click", () => show(index - 1));
+    document.getElementById("next").addEventListener("click", () => show(index + 1));
+
+    document.addEventListener("keydown", (event) => {
+      if (["ArrowRight", "PageDown", " "].includes(event.key)) {
+        event.preventDefault();
+        show(index + 1);
+      }
+      if (["ArrowLeft", "PageUp", "Backspace"].includes(event.key)) {
+        event.preventDefault();
+        show(index - 1);
+      }
+      if (event.key === "Home") show(0);
+      if (event.key === "End") show(slides.length - 1);
+    });
+
+    let touchX = null;
+    document.getElementById("stage").addEventListener("touchstart", (event) => {
+      touchX = event.changedTouches[0].clientX;
+    }, { passive: true });
+    document.getElementById("stage").addEventListener("touchend", (event) => {
+      if (touchX == null) return;
+      const dx = event.changedTouches[0].clientX - touchX;
+      if (Math.abs(dx) > 40) show(index + (dx < 0 ? 1 : -1));
+      touchX = null;
+    }, { passive: true });
+
+    document.querySelectorAll(".qcard").forEach((card) => {
+      const toggle = () => {
+        card.classList.toggle("open");
+        const hint = card.querySelector(".hint");
+        if (hint) hint.textContent = card.classList.contains("open") ? "Ocultar" : "Ver respuesta";
+      };
+      card.addEventListener("click", toggle);
+      card.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") toggle();
+      });
+    });
+
+    const fifoSteps = [
+      { op: "Cola vacía", items: [], note: "No hay frente ni final." },
+      { op: "encolar(Ana)", items: ["Ana"], note: "Ana es frente y final a la vez." },
+      { op: "encolar(Luis)", items: ["Ana", "Luis"], note: "Luis llega al final. Ana sigue al frente." },
+      { op: "encolar(Mara)", items: ["Ana", "Luis", "Mara"], note: "El orden de llegada queda fijo." },
+      { op: "desencolar() → Ana", items: ["Luis", "Mara"], leaving: "Ana", note: "Sale quien llevaba más tiempo. Ahora atiende Luis." }
+    ];
+
+    function drawPeople(step) {
+      const host = document.getElementById("fifo");
+      host.innerHTML = "";
+      if (step.leaving) {
+        const gone = document.createElement("div");
+        gone.className = "slot out";
+        gone.textContent = step.leaving;
+        const tag = document.createElement("span");
+        tag.className = "tag";
+        tag.textContent = "sale";
+        gone.appendChild(tag);
+        host.appendChild(gone);
+      }
+      if (step.items.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "slot";
+        empty.textContent = "∅";
+        host.appendChild(empty);
+      }
+      step.items.forEach((name, i) => {
+        const slot = document.createElement("div");
+        slot.className = "slot filled";
+        slot.textContent = name;
+        if (i === 0 || i === step.items.length - 1) {
+          const tag = document.createElement("span");
+          tag.className = "tag";
+          tag.textContent = i === 0 ? "frente" : "final";
+          if (step.items.length === 1) tag.textContent = "frente y final";
+          slot.appendChild(tag);
+        }
+        host.appendChild(slot);
+      });
+      document.getElementById("fifo-op").textContent = step.op;
+      document.getElementById("fifo-note").textContent = step.note;
+    }
+
+    let fifoAt = 0;
+    function showFifo(next) {
+      fifoAt = Math.max(0, Math.min(fifoSteps.length - 1, next));
+      drawPeople(fifoSteps[fifoAt]);
+      document.getElementById("fifo-prev").disabled = fifoAt === 0;
+      document.getElementById("fifo-next").disabled = fifoAt === fifoSteps.length - 1;
+    }
+    document.getElementById("fifo-prev").addEventListener("click", () => showFifo(fifoAt - 1));
+    document.getElementById("fifo-next").addEventListener("click", () => showFifo(fifoAt + 1));
+
+    const circSteps = [
+      { op: "Inicio", data: [null, null, null, null, null], front: 0, rear: -1, size: 0, note: "frente = 0, fin = -1, tamaño = 0." },
+      { op: "encolar(10)", data: [10, null, null, null, null], front: 0, rear: 0, size: 1, note: "fin = (−1 + 1) % 5 = 0." },
+      { op: "encolar(20)", data: [10, 20, null, null, null], front: 0, rear: 1, size: 2, note: "El final avanza un lugar." },
+      { op: "encolar(30)", data: [10, 20, 30, null, null], front: 0, rear: 2, size: 3, note: "El frente no se mueve al encolar." },
+      { op: "desencolar() → 10", data: [null, 20, 30, null, null], front: 1, rear: 2, size: 2, note: "Sale datos[0]. frente pasa a 1." },
+      { op: "desencolar() → 20", data: [null, null, 30, null, null], front: 2, rear: 2, size: 1, note: "Queda un elemento. frente y fin coinciden." },
+      { op: "encolar(40)", data: [null, null, 30, 40, null], front: 2, rear: 3, size: 2, note: "fin avanza a 3." },
+      { op: "encolar(50)", data: [null, null, 30, 40, 50], front: 2, rear: 4, size: 3, note: "fin llega al último índice." },
+      { op: "encolar(60)", data: [60, null, 30, 40, 50], front: 2, rear: 0, size: 4, note: "(4 + 1) % 5 = 0. El 60 ocupa el hueco liberado." }
+    ];
+
+    function drawCirc(step) {
+      const host = document.getElementById("circ");
+      host.innerHTML = "";
+      step.data.forEach((value, i) => {
+        const slot = document.createElement("div");
+        slot.className = "slot" + (value == null ? "" : " filled");
+        slot.textContent = value == null ? "" : String(value);
+        const labels = [];
+        if (step.size > 0 && i === step.front) labels.push("frente");
+        if (step.size > 0 && i === step.rear) labels.push("fin");
+        if (labels.length) {
+          const tag = document.createElement("span");
+          tag.className = "tag";
+          tag.textContent = i + " · " + labels.join(" ");
+          slot.appendChild(tag);
+        } else {
+          const tag = document.createElement("span");
+          tag.className = "tag";
+          tag.textContent = String(i);
+          slot.appendChild(tag);
+        }
+        host.appendChild(slot);
+      });
+      document.getElementById("circ-op").textContent = step.op;
+      document.getElementById("circ-note").textContent = step.note + " Tamaño = " + step.size + ".";
+    }
+
+    let circAt = 0;
+    function showCirc(next) {
+      circAt = Math.max(0, Math.min(circSteps.length - 1, next));
+      drawCirc(circSteps[circAt]);
+      document.getElementById("circ-prev").disabled = circAt === 0;
+      document.getElementById("circ-next").disabled = circAt === circSteps.length - 1;
+    }
+    document.getElementById("circ-prev").addEventListener("click", () => showCirc(circAt - 1));
+    document.getElementById("circ-next").addEventListener("click", () => showCirc(circAt + 1));
+
+    show(0);
+    showFifo(0);
+    showCirc(0);
+  </script>
+</body>
+</html>
