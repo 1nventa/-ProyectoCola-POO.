@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hábitos alimentarios saludables · Urbanización Britania</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,520;9..144,640&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #1a2420;
+      --muted: #5d675f;
+      --paper: #f4efe6;
+      --card: #fffdf8;
+      --green: #1b6844;
+      --green-deep: #0e3b28;
+      --leaf: #e5f2ea;
+      --terra: #c45c26;
+      --terra-soft: #f8ebe3;
+      --gold: #e7b15c;
+      --line: #e3dacb;
+      --shadow: 0 10px 30px rgba(24, 36, 28, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      font-family: "Source Sans 3", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: #d9d1c3;
+    }
+
+    .deck { height: 100dvh; overflow: hidden; }
+    .slide {
+      display: none;
+      height: calc(100dvh - 5.2rem);
+      overflow: auto;
+      padding: clamp(1.1rem, 2.4vw, 2.2rem) clamp(1.1rem, 3vw, 3rem) 1.1rem;
+      background:
+        radial-gradient(900px 420px at 100% -10%, rgba(231, 177, 92, 0.18), transparent 60%),
+        var(--paper);
+    }
+    .slide.is-active { display: block; }
+    .frame { max-width: 1120px; margin: 0 auto; }
+
+    h1, h2, h3 { font-family: Fraunces, Georgia, serif; font-weight: 560; letter-spacing: -0.02em; margin: 0; }
+    h1 { font-size: clamp(2.15rem, 4.4vw, 3.7rem); line-height: 1.05; color: var(--green-deep); }
+    h2 { font-size: clamp(1.65rem, 2.8vw, 2.45rem); line-height: 1.12; color: var(--green-deep); }
+    h3 { font-size: 1.15rem; }
+    p { margin: 0.45rem 0 0; line-height: 1.45; }
+    .kicker {
+      font-size: 0.78rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--terra);
+      margin-bottom: 0.45rem;
+    }
+    .lead { font-size: 1.12rem; max-width: 46rem; color: #314038; }
+    .note { color: var(--muted); font-size: 0.92rem; }
+    .source { margin-top: 0.7rem; color: var(--muted); font-size: 0.82rem; }
+
+    .cover {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 1.6rem;
+      align-items: stretch;
+      min-height: calc(100dvh - 9.2rem);
+    }
+    .cover-copy { display: flex; flex-direction: column; justify-content: center; }
+    .cover figure {
+      margin: 0;
+      border-radius: 22px;
+      overflow: hidden;
+      min-height: 320px;
+      position: relative;
+      box-shadow: var(--shadow);
+    }
+    .cover img, .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .cover figcaption, .cap {
+      position: absolute;
+      left: 0.8rem;
+      bottom: 0.8rem;
+      background: rgba(255, 253, 248, 0.92);
+      color: var(--green-deep);
+      font-size: 0.75rem;
+      padding: 0.28rem 0.55rem;
+      border-radius: 999px;
+    }
+    .team {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.15rem 1.2rem;
+      margin-top: 1.1rem;
+      font-size: 0.98rem;
+    }
+    .meta-line { margin-top: auto; padding-top: 1.2rem; color: var(--muted); }
+
+    .grid-2 { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 1rem; align-items: start; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
+    .stack { display: grid; gap: 0.75rem; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 0.95rem 1rem;
+    }
+    .card strong { display: block; font-size: 0.78rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--green); margin-bottom: 0.25rem; }
+    .stat .num {
+      font-family: Fraunces, Georgia, serif;
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      color: var(--green-deep);
+      line-height: 1;
+    }
+    .stat .num em { font-style: normal; color: var(--terra); }
+    .stat p { font-size: 0.95rem; }
+
+    .photo { margin: 0; border-radius: 16px; overflow: hidden; position: relative; min-height: 220px; }
+    .photo.tall { min-height: 280px; height: 100%; }
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+
+    .hbar { display: grid; gap: 0.42rem; }
+    .hbar-row { display: grid; grid-template-columns: 190px 1fr 64px; gap: 0.55rem; align-items: center; }
+    .hbar-name { font-size: 0.92rem; }
+    .hbar-track { height: 14px; background: #efe7da; border-radius: 999px; overflow: hidden; }
+    .hbar-fill { display: block; height: 100%; background: linear-gradient(90deg, #1b6844, #2f8a5b); border-radius: 999px; }
+    .hbar-val { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+
+    .bars {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.7rem;
+      align-items: end;
+      height: 250px;
+      padding-top: 0.4rem;
+    }
+    .col { display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; gap: 0.35rem; }
+    .col .shaft {
+      width: min(72px, 70%);
+      border-radius: 10px 10px 4px 4px;
+      background: #d9773a;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding-top: 0.35rem;
+    }
+    .col .shaft.soft { background: #8d8a84; }
+    .col span.label { text-align: center; font-size: 0.86rem; line-height: 1.2; min-height: 2.4em; }
+
+    .compare { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.55rem; }
+    .cmp {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 0.7rem 0.55rem 0.75rem;
+      text-align: center;
+    }
+    .cmp h3 { font-family: "Source Sans 3", sans-serif; font-size: 0.82rem; font-weight: 700; min-height: 2.6em; }
+    .pair { display: flex; gap: 0.4rem; height: 158px; align-items: stretch; justify-content: center; margin: 0.35rem 0 0.15rem; }
+    .pair .colb { width: 42%; display: flex; flex-direction: column; align-items: center; gap: 0.18rem; }
+    .pair .colb span { font-size: 0.75rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; }
+    .pair .track { flex: 1; width: 100%; display: flex; align-items: flex-end; min-height: 0; }
+    .pair i { display: block; width: 100%; border-radius: 8px 8px 3px 3px; }
+    .antes { background: #c45c26; }
+    .meta { background: #1b6844; }
+    .legend { display: flex; gap: 1rem; font-size: 0.88rem; margin-top: 0.55rem; }
+    .swatch { width: 0.75rem; height: 0.75rem; border-radius: 3px; display: inline-block; margin-right: 0.3rem; }
+
+    ol.steps { margin: 0.3rem 0 0; padding: 0; list-style: none; display: grid; gap: 0.45rem; }
+    ol.steps li {
+      display: grid;
+      grid-template-columns: 2rem 1fr;
+      gap: 0.6rem;
+      align-items: start;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 0.55rem 0.7rem;
+    }
+    ol.steps b {
+      width: 2rem; height: 2rem; border-radius: 50%;
+      display: grid; place-items: center;
+      background: var(--green-deep); color: white; font-size: 0.9rem;
+    }
+
+    table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 14px; overflow: hidden; }
+    th, td { text-align: left; padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--line); vertical-align: top; font-size: 0.95rem; }
+    th { background: var(--green-deep); color: white; font-weight: 600; }
+    tr:last-child td { border-bottom: 0; }
+    td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+    .formula {
+      background: var(--green-deep);
+      color: #f6f1e7;
+      border-radius: 16px;
+      padding: 1rem 1.1rem;
+    }
+    .formula code {
+      display: block;
+      font-family: Fraunces, Georgia, serif;
+      font-size: 1.15rem;
+      margin: 0.35rem 0 0.2rem;
+    }
+    .pill {
+      display: inline-block;
+      background: var(--leaf);
+      color: var(--green-deep);
+      border-radius: 999px;
+      padding: 0.18rem 0.55rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      margin: 0.15rem 0.25rem 0 0;
+    }
+    .warn {
+      background: var(--terra-soft);
+      border-left: 4px solid var(--terra);
+      border-radius: 12px;
+      padding: 0.7rem 0.85rem;
+    }
+
+    .nav {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.8rem;
+      padding: 0.65rem 1rem;
+      background: rgba(244, 239, 230, 0.94);
+      border-top: 1px solid var(--line);
+      backdrop-filter: blur(8px);
+      z-index: 5;
+    }
+    .nav button {
+      font: inherit;
+      font-weight: 700;
+      border: 0;
+      background: var(--green-deep);
+      color: white;
+      border-radius: 999px;
+      padding: 0.55rem 0.95rem;
+      cursor: pointer;
+    }
+    .nav button:disabled { opacity: 0.35; cursor: default; }
+    .dots { display: flex; gap: 0.32rem; flex-wrap: wrap; justify-content: center; max-width: 46vw; }
+    .dots button {
+      width: 0.55rem; height: 0.55rem; padding: 0; border-radius: 50%;
+      background: #c9bfae; 
+    }
+    .dots button[aria-current="true"] { background: var(--terra); transform: scale(1.25); }
+    .count { font-variant-numeric: tabular-nums; color: var(--muted); min-width: 4.5rem; text-align: right; }
+
+    .refs { display: grid; gap: 0.45rem; }
+    .refs p { font-size: 0.95rem; }
+
+    @media screen and (max-width: 860px) {
+      .cover, .grid-2, .grid-3, .grid-4, .split, .compare { grid-template-columns: 1fr; }
+      .team { grid-template-columns: 1fr; }
+      .bars { height: auto; }
+      .col { height: auto; }
+      .hbar-row { grid-template-columns: 1fr; gap: 0.15rem; }
+      .hbar-val { text-align: left; }
+      .cover { min-height: 0; }
+      .dots { display: none; }
+      .compare { grid-template-columns: 1fr 1fr; }
+      .pair { height: 112px; }
+      .cmp h3 { min-height: 0; }
+    }
+
+    @media screen and (max-height: 760px) and (min-width: 861px) {
+      h2 { font-size: 1.55rem; }
+      .lead { font-size: 1rem; }
+      .bars { height: 190px; }
+      .pair { height: 110px; }
+    }
+
+    @page {
+      size: 13.333in 7.5in;
+      margin: 0;
+    }
+
+    @media print {
+      html, body { background: var(--paper); }
+      .nav { display: none !important; }
+      .deck { height: auto; overflow: visible; }
+      .slide {
+        display: flex !important;
+        align-items: center;
+        width: 13.333in;
+        height: 7.5in;
+        min-height: 7.5in;
+        max-height: 7.5in;
+        overflow: hidden;
+        break-after: page;
+        page-break-after: always;
+        padding: 0.42in 0.55in;
+      }
+      .slide:last-child { break-after: auto; page-break-after: auto; }
+      .frame { width: 100%; max-width: none; }
+      .cover { min-height: 0; height: 6.4in; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck" id="deck">
+    <section class="slide is-active" aria-label="Portada">
+      <div class="frame cover">
+        <div class="cover-copy">
+          <p class="kicker">Salud pública · Nutrición y dietética</p>
+          <h1>Hábitos alimentarios saludables en la población adulta</h1>
+          <p class="lead">Plan de intervención en la Urbanización Britania, Cartagena de Indias. Prevención primaria a partir de una encuesta a 27 adultos.</p>
+          <div class="team">
+            <span>Camila Aguas Morales</span>
+            <span>Camila Benavides</span>
+            <span>Luis Fernando Bertel</span>
+            <span>David Carmona Rivero</span>
+            <span>Yorgeth Figueroa Hernández</span>
+            <span>Rosa Madrid Negrete</span>
+            <span>Karen Meléndez Rodriguez</span>
+            <span>Zharick Rodríguez Arbelaez</span>
+          </div>
+          <p class="meta-line">Cartagena, 28 de octubre</p>
+        </div>
+        <figure>
+          <img src="img/portada-frutas.jpg" alt="Mango, papaya, banano, limón, tomate, hojas verdes y un vaso de agua sobre una mesa de madera.">
+          <figcaption>Imagen ilustrativa</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Resumen">
+      <div class="frame">
+        <p class="kicker">En una mirada</p>
+        <h2>Lo que el informe deja listo para contar</h2>
+        <div class="grid-2" style="margin-top:1rem">
+          <div class="stack">
+            <article class="card"><strong>Problema</strong>Comidas rápidas, ultraprocesados y bebidas azucaradas, con pocas frutas y verduras. Eso eleva el riesgo de enfermedades crónicas no transmisibles.</article>
+            <article class="card"><strong>Línea base</strong>Encuesta en línea a 27 personas. El 74,1 % come ninguna o una porción de verduras al día y el 40,7 % no come fruta a diario.</article>
+            <article class="card"><strong>Respuesta</strong>Educación alimentaria y nutricional, menús económicos y organización del tiempo. Prevención primaria, antes de que aparezca la enfermedad.</article>
+            <article class="card"><strong>Lo que falta medir</strong>Las metas SMART están definidas. La segunda encuesta, la del “después”, todavía no aparece en el informe.</article>
+          </div>
+          <figure class="photo tall">
+            <img src="img/contraste-alimentos.jpg" alt="A un lado frutas y verduras frescas; al otro una comida rápida, papas y una bebida oscura sin marca.">
+            <figcaption class="cap">Imagen ilustrativa · fresco frente a ultraprocesado</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Por qué intervenir">
+      <div class="frame">
+        <p class="kicker">1 · Diagnóstico</p>
+        <h2>Intervenir ahora, mientras el hábito todavía se puede cambiar</h2>
+        <p class="lead">La alimentación inadecuada es un riesgo modificable de exceso de peso, diabetes tipo 2, hipertensión y enfermedad cardiovascular.</p>
+        <div class="grid-3" style="margin-top:1rem">
+          <article class="card stat"><div class="num">400 g</div><p>Mínimo diario de frutas y verduras que recomienda la OMS, cerca de cinco porciones, para prevenir las ECNT.</p></article>
+          <article class="card stat"><div class="num">56,4 %</div><p>De los adultos colombianos tenía exceso de peso en la ENSIN 2015. El problema ya es nacional.</p></article>
+          <article class="card stat"><div class="num">Ninguna</div><p>Persona de Britania llegaba a tres porciones de fruta. Solo el 25,9 % comía dos o más porciones de verduras.</p></article>
+        </div>
+        <p class="source">La población encuestada es joven: el 85,2 % tiene entre 18 y 29 años. Cambiar el hábito en esta etapa evita que se consolide antes de la enfermedad.</p>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Quiénes respondieron">
+      <div class="frame">
+        <p class="kicker">Línea base · n = 27</p>
+        <h2>Una comunidad joven, estudiante y de estratos bajos</h2>
+        <div class="grid-4" style="margin-top:1rem">
+          <article class="card stat"><div class="num">63 %</div><p>Mujeres. Hombres: 37 % (10 personas).</p></article>
+          <article class="card stat"><div class="num">85 %</div><p>Entre 18 y 29 años. Hay 2 personas de 40–49 y 2 de 50–59.</p></article>
+          <article class="card stat"><div class="num">59 %</div><p>Estudiantes. Empleados: 22,2 %. Otras situaciones: 18,5 %.</p></article>
+          <article class="card stat"><div class="num">89 %</div><p>Estratos 1 a 3. El 66,6 % vive en estrato 1 o 2.</p></article>
+        </div>
+        <div class="grid-3" style="margin-top:0.8rem">
+          <article class="card"><strong>Educación</strong>Universitaria 48,1 %, secundaria 25,9 %, técnica 18,5 % y posgrado 7,4 %.</article>
+          <article class="card"><strong>Ingreso del hogar</strong>El 66,6 % llega hasta dos salarios mínimos. El 33,3 % está por debajo de un salario.</article>
+          <article class="card"><strong>Hogar</strong>El 59,3 % vive con 2 o 3 personas. El 33,3 % vive en hogares de 4 o 5.</article>
+        </div>
+        <p class="source">Tabla 1 del informe. Encuesta propia, formulario en línea, Urbanización Britania.</p>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Hábitos encontrados">
+      <div class="frame">
+        <p class="kicker">Lo que come hoy</p>
+        <h2>La distancia frente a una alimentación saludable</h2>
+        <div class="grid-2" style="margin-top:1rem">
+          <div class="grid-2" style="grid-template-columns:1fr 1fr">
+            <article class="card stat"><div class="num em">40,7 %</div><p>No consume ninguna porción de fruta al día. El 51,9 % consume solo una.</p></article>
+            <article class="card stat"><div class="num em">74,1 %</div><p>Come ninguna o una porción de verduras. Solo el 25,9 % llega a dos o más.</p></article>
+            <article class="card stat"><div class="num em">88,9 %</div><p>Consume ultraprocesados de 1 a 4 veces por semana. El 7,4 % los come a diario.</p></article>
+            <article class="card stat"><div class="num em">55,5 %</div><p>Bebe menos de 1,5 litros de agua al día. El 63 % sí hace tres tiempos de comida.</p></article>
+          </div>
+          <div class="stack">
+            <figure class="photo" style="min-height:190px">
+              <img src="img/agua-dia.jpg" alt="Jarra y vasos de agua con limón y hierbabuena, junto a un tazón de fruta picada.">
+              <figcaption class="cap">Imagen ilustrativa · agua y fruta</figcaption>
+            </figure>
+            <article class="card"><strong>También en la semana</strong>Comida rápida 2 o más veces: 37 %. Comer fuera 1 o 2 veces: 66,7 %. Bebidas azucaradas al menos algunas veces: 74,1 % (51,9 % algunas veces y 22,2 % frecuente).</article>
+          </div>
+        </div>
+        <p class="source">Tabla 2 y sección 5.1. No mezclar “1 a 4 veces por semana” (88,9 %) con “3 o más veces” (33,3 %): miden cortes distintos.</p>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Factores de riesgo">
+      <div class="frame">
+        <p class="kicker">Figura 1 del informe</p>
+        <h2>Los siete riesgos que el grupo priorizó</h2>
+        <div class="card" style="margin-top:1rem">
+          <div class="hbar" role="img" aria-label="Bebidas azucaradas y pocas verduras, 74,1 por ciento. Conocimientos insuficientes, 59,3. Agua menor a 1,5 litros, 55,5. Ninguna fruta, 40,7. Comida rápida dos o más veces, 37. Ultraprocesados tres o más veces, 33,3.">
+            <div class="hbar-row"><span class="hbar-name">Bebidas azucaradas</span><span class="hbar-track"><span class="hbar-fill" style="width:82.3%"></span></span><span class="hbar-val">74,1 %</span></div>
+            <div class="hbar-row"><span class="hbar-name">0–1 porción de verduras</span><span class="hbar-track"><span class="hbar-fill" style="width:82.3%"></span></span><span class="hbar-val">74,1 %</span></div>
+            <div class="hbar-row"><span class="hbar-name">Conocimientos insuficientes</span><span class="hbar-track"><span class="hbar-fill" style="width:65.9%"></span></span><span class="hbar-val">59,3 %</span></div>
+            <div class="hbar-row"><span class="hbar-name">Agua menor a 1,5 L</span><span class="hbar-track"><span class="hbar-fill" style="width:61.7%"></span></span><span class="hbar-val">55,5 %</span></div>
+            <div class="hbar-row"><span class="hbar-name">Ninguna fruta al día</span><span class="hbar-track"><span class="hbar-fill" style="width:45.2%"></span></span><span class="hbar-val">40,7 %</span></div>
+            <div class="hbar-row"><span class="hbar-name">Comida rápida ≥ 2 veces</span><span class="hbar-track"><span class="hbar-fill" style="width:41.1%"></span></span><span class="hbar-val">37,0 %</span></div>
+            <div class="hbar-row"><span class="hbar-name">Ultraprocesados ≥ 3 veces</span><span class="hbar-track"><span class="hbar-fill" style="width:37%"></span></span><span class="hbar-val">33,3 %</span></div>
+          </div>
+        </div>
+        <p class="source">Porcentaje de participantes (n = 27). La barra usa la misma escala del informe, de 0 a 90. Bebidas azucaradas: algunas veces o frecuente.</p>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Barreras">
+      <div class="frame">
+        <p class="kicker">Figura 2 · principal dificultad</p>
+        <h2>El tiempo pesa más que el precio, y el precio pesa mucho</h2>
+        <div class="grid-2" style="margin-top:0.8rem">
+          <div>
+            <div class="bars" role="img" aria-label="Falta de tiempo 40,7 por ciento. Precio 29,6. Falta de conocimientos 18,5. Otras razones 11,2.">
+              <div class="col"><div class="shaft" style="height:81.4%">40,7</div><span class="label">Falta de tiempo</span></div>
+              <div class="col"><div class="shaft" style="height:59.2%">29,6</div><span class="label">Precio de lo saludable</span></div>
+              <div class="col"><div class="shaft" style="height:37%">18,5</div><span class="label">Falta de conocimientos</span></div>
+              <div class="col"><div class="shaft soft" style="height:22.4%">11,2</div><span class="label">Otras razones</span></div>
+            </div>
+            <p class="note">Escala de 0 a 50, como en la figura original. Suma 100 %: cada persona marcó una dificultad principal.</p>
+          </div>
+          <div class="stack">
+            <figure class="photo" style="min-height:180px">
+              <img src="img/barreras-tiempo-precio.jpg" alt="Reloj sin números, una pila de monedas y zanahorias, cebolla y limón sobre una mesa gastada.">
+              <figcaption class="cap">Imagen ilustrativa · tiempo y costo</figcaption>
+            </figure>
+            <article class="card"><strong>El precio, con otra pregunta</strong>El 29,6 % dice que el costo dificulta siempre el consumo de alimentos saludables y el 37,0 % que lo dificulta algunas veces. Juntos, 66,6 %.</article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Conocimiento e interés">
+      <div class="frame">
+        <p class="kicker">Lo que ya se puede afirmar</p>
+        <h2>Saber no basta, y casi todos quieren participar</h2>
+        <div class="grid-3" style="margin-top:1rem">
+          <article class="card stat"><div class="num em">59,3 %</div><p>Se percibe sin conocimientos suficientes sobre alimentación saludable. Meta: bajar a 30 % o menos.</p></article>
+          <article class="card stat"><div class="num">51,9 %</div><p>Ya había recibido orientación. La información aislada no cambió el hábito: hace falta práctica.</p></article>
+          <article class="card stat"><div class="num">88,9 %</div><p>Dijo que sí participaría (59,3 %) o que tal vez (29,6 %). Es la mayor fortaleza del proyecto.</p></article>
+        </div>
+        <div class="warn" style="margin-top:1rem">
+          <strong>Impacto ya observable.</strong> El informe no trae la medición de seguimiento. Lo que sí está logrado es el diagnóstico, la priorización y una disposición alta para los talleres.
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Objetivos">
+      <div class="frame">
+        <p class="kicker">2 · Objetivos SMART</p>
+        <h2>Una meta general y cinco cambios medibles</h2>
+        <p class="lead">Promover hábitos saludables en los adultos de Britania, con educación alimentaria y nutricional, para reducir el riesgo de enfermedades crónicas.</p>
+        <div style="overflow:auto; margin-top:0.8rem">
+          <table>
+            <thead><tr><th>Qué cambiar</th><th>Hoy</th><th>Meta al cerrar los talleres</th></tr></thead>
+            <tbody>
+              <tr><td>Quienes se sienten sin conocimientos suficientes</td><td class="num">59,3 %</td><td class="num">≤ 30 %</td></tr>
+              <tr><td>Sin fruta a diario / con 0–1 porción de verduras</td><td class="num">40,7 % · 74,1 %</td><td class="num">≤ 20 % · ≤ 50 %</td></tr>
+              <tr><td>Bebidas azucaradas / ultraprocesados ≥ 3 veces por semana</td><td class="num">74,1 % · 33,3 %</td><td class="num">≤ 50 % · ≤ 20 %</td></tr>
+              <tr><td>Agua menor a 1,5 litros al día</td><td class="num">55,5 %</td><td class="num">≤ 30 %</td></tr>
+              <tr><td>Asistir a mínimo 2 de 3 sesiones y elaborar un menú económico</td><td class="num">Proceso</td><td class="num">≥ 80 %</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="source">Tabla 3. Cada meta tiene indicador, línea base y plazo: el cierre del ciclo de talleres.</p>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Metodología">
+      <div class="frame">
+        <p class="kicker">3 · Metodología</p>
+        <h2>Prevención primaria, en seis pasos</h2>
+        <div class="grid-2" style="margin-top:0.8rem">
+          <ol class="steps">
+            <li><b>1</b><span>Elegir el problema y el lugar: hábitos poco saludables en adultos de la Urbanización Britania.</span></li>
+            <li><b>2</b><span>Diseñar y aplicar la encuesta en línea. Respondieron 27 personas.</span></li>
+            <li><b>3</b><span>Tabular y priorizar: frutas, verduras, tiempo, precio y conocimientos.</span></li>
+            <li><b>4</b><span>Diseñar el programa según el presupuesto, el tiempo y los alimentos disponibles.</span></li>
+            <li><b>5</b><span>Hacer los talleres, los menús económicos y la orientación de horarios.</span></li>
+            <li><b>6</b><span>Volver a aplicar el cuestionario y dejar recomendaciones de continuidad.</span></li>
+          </ol>
+          <div class="stack">
+            <figure class="photo" style="min-height:230px">
+              <img src="img/taller-plato.jpg" alt="Varias manos sirven un plato con pescado, arroz, frijoles, ensalada y fruta.">
+              <figcaption class="cap">Imagen ilustrativa · taller de preparación</figcaption>
+            </figure>
+            <article class="card"><strong>Nivel de prevención</strong>Personas aparentemente sanas. Se actúa sobre el riesgo antes de la enfermedad, con educación para la salud en el marco de la Carta de Ottawa. La encuesta también identifica riesgos.</article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Actividades y recursos">
+      <div class="frame">
+        <p class="kicker">Lo que se pone en práctica</p>
+        <h2>Talleres cortos, visuales y con comida real</h2>
+        <div class="grid-2" style="margin-top:1rem">
+          <div class="stack">
+            <article class="card"><strong>En el taller</strong>Porciones de frutas y verduras, menús saludables y económicos, comidas rápidas de preparar, más agua y menos bebidas azucaradas y ultraprocesados.</article>
+            <article class="card"><strong>Por qué así</strong>El 40,7 % no tiene tiempo, el precio es la segunda barrera y la mayoría tiene entre 18 y 29 años. El mensaje tiene que ser breve, práctico y barato.</article>
+            <div>
+              <span class="pill">8 estudiantes facilitadores</span>
+              <span class="pill">Encuesta y asistencia</span>
+              <span class="pill">Guías alimentarias colombianas</span>
+              <span class="pill">Frutas, verduras y agua</span>
+              <span class="pill">Celulares y computadores</span>
+            </div>
+          </div>
+          <article class="card">
+            <strong>Material de referencia</strong>
+            <p>Guías alimentarias basadas en alimentos para la población colombiana mayor de 2 años (ICBF y Ministerio de Salud, 2020). La presentación de clase se apoyó en material visual de porciones y en guías de menú.</p>
+            <p style="margin-top:0.7rem">Humanos, instrumentos, material educativo, alimentos de demostración y tecnología. Tabla 4 del informe.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Evaluación">
+      <div class="frame">
+        <p class="kicker">4 · Sistema de evaluación</p>
+        <h2>Proceso para saber si se hizo. Impacto para saber si cambió.</h2>
+        <div class="split" style="margin-top:1rem">
+          <article class="card">
+            <strong>Proceso</strong>
+            <p>Cobertura: participantes sobre convocados. Meta ≥ 80 %.</p>
+            <p>Sesiones hechas sobre sesiones planeadas. Meta 100 %.</p>
+            <p>Menús saludables y económicos elaborados. Meta ≥ 80 % de quienes asisten.</p>
+          </article>
+          <article class="card">
+            <strong>Impacto, del antes a la meta</strong>
+            <p>Conocimientos insuficientes: 59,3 % → ≤ 30 %.</p>
+            <p>Sin fruta diaria: 40,7 % → ≤ 20 %. Verduras 0–1: 74,1 % → ≤ 50 %.</p>
+            <p>Bebidas azucaradas 74,1 % → ≤ 50 %. Ultraprocesados ≥ 3/semana: 33,3 % → ≤ 20 %.</p>
+            <p>Agua &lt; 1,5 L: 55,5 % → ≤ 30 %.</p>
+          </article>
+        </div>
+        <p class="source">Mismo cuestionario antes y después, preguntas de frecuencia, barreras e interés, y registro de asistencia. Así el cambio se puede comparar.</p>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Antes y meta">
+      <div class="frame">
+        <p class="kicker">Figura 3 · no es un resultado medido</p>
+        <h2>De la línea base a la meta esperada</h2>
+        <div class="compare" style="margin-top:0.9rem" role="img" aria-label="Comparación entre el antes medido y la meta. Fruta 40,7 a 20. Verduras 74,1 a 50. Bebidas 74,1 a 50. Ultraprocesados 33,3 a 20. Agua 55,5 a 30. Conocimientos 59,3 a 30.">
+          <article class="cmp"><h3>Sin fruta diaria</h3><div class="pair"><div class="colb"><span>40,7</span><div class="track"><i class="antes" style="height:54%"></i></div></div><div class="colb"><span>20</span><div class="track"><i class="meta" style="height:26.7%"></i></div></div></div></article>
+          <article class="cmp"><h3>0–1 verdura</h3><div class="pair"><div class="colb"><span>74,1</span><div class="track"><i class="antes" style="height:98.8%"></i></div></div><div class="colb"><span>50</span><div class="track"><i class="meta" style="height:66.7%"></i></div></div></div></article>
+          <article class="cmp"><h3>Bebidas azucaradas</h3><div class="pair"><div class="colb"><span>74,1</span><div class="track"><i class="antes" style="height:98.8%"></i></div></div><div class="colb"><span>50</span><div class="track"><i class="meta" style="height:66.7%"></i></div></div></div></article>
+          <article class="cmp"><h3>Ultraprocesados ≥ 3</h3><div class="pair"><div class="colb"><span>33,3</span><div class="track"><i class="antes" style="height:44.4%"></i></div></div><div class="colb"><span>20</span><div class="track"><i class="meta" style="height:26.7%"></i></div></div></div></article>
+          <article class="cmp"><h3>Agua &lt; 1,5 L</h3><div class="pair"><div class="colb"><span>55,5</span><div class="track"><i class="antes" style="height:74%"></i></div></div><div class="colb"><span>30</span><div class="track"><i class="meta" style="height:40%"></i></div></div></div></article>
+          <article class="cmp"><h3>Saber insuficiente</h3><div class="pair"><div class="colb"><span>59,3</span><div class="track"><i class="antes" style="height:79%"></i></div></div><div class="colb"><span>30</span><div class="track"><i class="meta" style="height:40%"></i></div></div></div></article>
+        </div>
+        <div class="legend"><span><i class="swatch antes"></i>Antes, encuesta</span><span><i class="swatch meta"></i>Después, meta esperada</span><span class="note">Reducción buscada: 20,7 · 24,1 · 24,1 · 13,3 · 25,5 · 29,3 puntos.</span></div>
+        <p class="source">Tabla 6. La columna de seguimiento del informe dice “por medir” en los seis indicadores.</p>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Cumplimiento">
+      <div class="frame">
+        <p class="kicker">5 · Cumplimiento</p>
+        <h2>La fórmula ya está. El segundo dato, no.</h2>
+        <div class="grid-2" style="margin-top:1rem">
+          <div class="formula">
+            <span>Porcentaje de cumplimiento</span>
+            <code>(antes − después) / (antes − meta) × 100</code>
+            <p>Si quien no come fruta a diario bajara de 40,7 % a 25 %, el cumplimiento sería (40,7 − 25) / (40,7 − 20) × 100 = 75,8 %. Llegar a 100 % o más significa que la meta se cumplió.</p>
+          </div>
+          <article class="card">
+            <strong>Cómo leerlo en la sustentación</strong>
+            <p>No decir que los hábitos ya mejoraron. Decir que el diagnóstico justificó la intervención y que el cuestionario se vuelve a aplicar al cerrar.</p>
+            <p>Con 27 personas el resultado es descriptivo. No representa a toda la urbanización. El informe recomienda ampliar la recolección.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Determinantes">
+      <div class="frame">
+        <p class="kicker">6 · Discusión</p>
+        <h2>El plato también lo decide el entorno</h2>
+        <div class="grid-2" style="margin-top:1rem">
+          <div class="grid-2" style="grid-template-columns:1fr 1fr">
+            <article class="card"><strong>Dinero</strong>El 66,6 % de los hogares llega hasta dos salarios mínimos y el 66,6 % está en estrato 1 o 2. El precio dificulta siempre o a veces al 66,6 %.</article>
+            <article class="card"><strong>Educación</strong>El 59,3 % reconoce vacíos, aunque el 51,9 % ya recibió orientación. Hace falta acompañar la práctica, no solo informar.</article>
+            <article class="card"><strong>Tiempo</strong>Estudio y trabajo dejan poco margen para cocinar. Por eso ganan la comida rápida y la comida preparada.</article>
+            <article class="card"><strong>Oferta</strong>Lo ultraprocesado suele ser más barato y más fácil de conseguir que la fruta y la verdura.</article>
+          </div>
+          <article class="card">
+            <strong>Lecciones que ya ajustaron el taller</strong>
+            <p>Organizar horarios y preparar comidas rápidas, porque el tiempo fue la barrera principal.</p>
+            <p>Proponer menús con alimentos accesibles, porque el precio fue la segunda.</p>
+            <p>Hablar breve, práctico y visual, porque la audiencia es joven.</p>
+            <p>No generalizar: 27 casos describen a quienes respondieron.</p>
+          </article>
+        </div>
+        <p class="source">Comisión sobre Determinantes Sociales de la Salud, OMS, 2009. Las condiciones en que se nace, vive, estudia y trabaja condicionan el hábito.</p>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Sostenibilidad">
+      <div class="frame">
+        <p class="kicker">Para que no se quede en un ciclo</p>
+        <h2>Cinco formas de sostener el cambio</h2>
+        <div class="grid-2" style="margin-top:1rem">
+          <figure class="photo tall">
+            <img src="img/huerta-comunitaria.jpg" alt="Huerta de barrio con eras de hortalizas y una caja de tomates y pimentones.">
+            <figcaption class="cap">Imagen ilustrativa · huerta y mercado fresco</figcaption>
+          </figure>
+          <ol class="steps">
+            <li><b>1</b><span>Formar promotores voluntarios que sigan con los talleres.</span></li>
+            <li><b>2</b><span>Articular la Junta de Acción Comunal, los colegios y el centro de salud cercano.</span></li>
+            <li><b>3</b><span>Abrir huertas, mercados frescos o compras colectivas para bajar el precio.</span></li>
+            <li><b>4</b><span>Compartir recetarios económicos y un plan semanal por redes y mensajería.</span></li>
+            <li><b>5</b><span>Repetir los indicadores cada seis meses y ajustar lo que no se mueva.</span></li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Conclusiones">
+      <div class="frame">
+        <p class="kicker">Cierre</p>
+        <h2>Tres ideas para dejar en la sustentación</h2>
+        <div class="grid-3" style="margin-top:1rem">
+          <article class="card"><strong>Sí hacía falta intervenir</strong>El 74,1 % come ninguna o una verdura, el 40,7 % no come fruta a diario y casi 9 de cada 10 consumen ultraprocesados con regularidad. En gente joven, la prevención primaria llega a tiempo.</article>
+          <article class="card"><strong>No es solo falta de información</strong>Tiempo, precio y conocimiento se cruzan con ingresos bajos y estratos 1 y 2. La educación tiene que ser práctica, económica y pegada a la rutina.</article>
+          <article class="card"><strong>Hay con quién continuar</strong>El 88,9 % participaría o tal vez lo haría. Las metas y la fórmula de cumplimiento ya permiten medir el cambio cuando se aplique la segunda encuesta.</article>
+        </div>
+        <p class="source">Recomendación del informe: ampliar la muestra y sostener el trabajo con líderes comunitarios e instituciones locales.</p>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Referencias">
+      <div class="frame">
+        <p class="kicker">Referencias del informe</p>
+        <h2>De dónde salen las cifras y los marcos</h2>
+        <div class="refs" style="margin-top:1rem">
+          <p>Instituto Colombiano de Bienestar Familiar y Ministerio de Salud y Protección Social. (2020). <em>Guías alimentarias basadas en alimentos para la población colombiana mayor de 2 años.</em> Bogotá.</p>
+          <p>Ministerio de Salud y Protección Social, ICBF y otros. (2019). <em>Encuesta Nacional de la Situación Nutricional de Colombia 2015 (ENSIN 2015).</em> Bogotá.</p>
+          <p>Organización Mundial de la Salud. (2020). <em>Alimentación sana</em> [nota descriptiva].</p>
+          <p>Organización Mundial de la Salud. (1986). <em>Carta de Ottawa para la promoción de la salud.</em> Ottawa.</p>
+          <p>Comisión sobre Determinantes Sociales de la Salud. (2009). <em>Subsanar las desigualdades en una generación.</em> OMS.</p>
+          <p>Línea base: encuesta propia del grupo en la Urbanización Britania (n = 27).</p>
+        </div>
+        <p class="source">Las fotografías de esta presentación son ilustraciones. No son registros del trabajo de campo. El PDF original está en <code>fuente/informe-salud-publica.pdf</code>.</p>
+      </div>
+    </section>
+  </main>
+
+  <nav class="nav" aria-label="Controles de la presentación">
+    <button type="button" id="prev">Anterior</button>
+    <div class="dots" id="dots"></div>
+    <span class="count" id="count">1 / 17</span>
+    <button type="button" id="next">Siguiente</button>
+  </nav>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll(".slide"));
+    const prev = document.getElementById("prev");
+    const next = document.getElementById("next");
+    const count = document.getElementById("count");
+    const dots = document.getElementById("dots");
+    let index = 0;
+
+    slides.forEach((slide, i) => {
+      const dot = document.createElement("button");
+      dot.type = "button";
+      dot.setAttribute("aria-label", "Ir a la diapositiva " + (i + 1));
+      dot.addEventListener("click", () => show(i));
+      dots.appendChild(dot);
+    });
+
+    function show(n) {
+      index = Math.max(0, Math.min(slides.length - 1, n));
+      slides.forEach((slide, i) => {
+        const active = i === index;
+        slide.classList.toggle("is-active", active);
+        if (active) slide.scrollTop = 0;
+      });
+      Array.from(dots.children).forEach((dot, i) => {
+        dot.setAttribute("aria-current", i === index ? "true" : "false");
+      });
+      count.textContent = (index + 1) + " / " + slides.length;
+      prev.disabled = index === 0;
+      next.disabled = index === slides.length - 1;
+      history.replaceState(null, "", "#" + (index + 1));
+    }
+
+    prev.addEventListener("click", () => show(index - 1));
+    next.addEventListener("click", () => show(index + 1));
+    document.addEventListener("keydown", (event) => {
+      if (["ArrowRight", "PageDown", " "].includes(event.key)) {
+        event.preventDefault();
+        show(index + 1);
+      } else if (["ArrowLeft", "PageUp", "Backspace"].includes(event.key)) {
+        event.preventDefault();
+        show(index - 1);
+      } else if (event.key === "Home") {
+        show(0);
+      } else if (event.key === "End") {
+        show(slides.length - 1);
+      }
+    });
+
+    let touchX = null;
+    document.addEventListener("touchstart", (event) => {
+      touchX = event.changedTouches[0].clientX;
+    }, { passive: true });
+    document.addEventListener("touchend", (event) => {
+      if (touchX === null) return;
+      const delta = event.changedTouches[0].clientX - touchX;
+      if (Math.abs(delta) > 50) show(index + (delta < 0 ? 1 : -1));
+      touchX = null;
+    }, { passive: true });
+
+    function fromHash() {
+      const n = Number((location.hash || "").replace("#", ""));
+      if (Number.isFinite(n) && n > 0) show(n - 1);
+    }
+
+    window.addEventListener("hashchange", fromHash);
+    const initial = Number((location.hash || "").replace("#", ""));
+    show(Number.isFinite(initial) && initial > 0 ? initial - 1 : 0);
+  </script>
+</body>
+</html>
